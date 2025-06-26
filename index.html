@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>sptzyy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0f172a; }
+    .hidden { display: none; }
+    .spin-slow { animation: spin 3s linear infinite; }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fade-in { animation: fade-in 0.3s ease-out; }
+    canvas#starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body class="text-white font-sans flex items-center justify-center min-h-screen p-4 relative">
+
+  <canvas id="starfield"></canvas>
+
+  <!-- Produk -->
+  <div id="produkPage" class="w-full max-w-5xl space-y-6 text-center">
+    <div class="flex justify-center mb-4">
+      <div class="relative w-24 h-24 rounded-full p-1">
+        <div class="absolute inset-0 rounded-full border-4 border-blue-600 spin-slow"></div>
+        <img src="https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif" class="w-full h-full object-cover rounded-full border-4 border-gray-900"/>
+      </div>
+    </div>
+    <h1 class="text-2xl font-bold">SPTZYY STORE</h1>
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <!-- Produk 1 -->
+      <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+        <img src="https://i.ibb.co/1fSRCCt1/20250626-070621.jpg?text=FB+Auto+Login" class="rounded-lg mb-3 w-full object-cover h-36" />
+        <h2 class="text-lg font-semibold">Harga 100K</h2>
+        <p class="text-gray-300">1 Bulan (Encrypted)</p>
+        <p class="text-sm text-gray-400 mt-1">🛠 Facebook Auto Login</p>
+        <button onclick="showModal(0)" class="mt-4 w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg">BELI</button>
+      </div>
+
+      <!-- Produk 2 -->
+      <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+        <img src="https://i.ibb.co/NdGYHZQm/20250626-070555.jpg?text=IG+Auto+Login" class="rounded-lg mb-3 w-full object-cover h-36" />
+        <h2 class="text-lg font-semibold">Harga 200K</h2>
+        <p class="text-gray-300">3 Bulan (Encrypted)</p>
+        <p class="text-sm text-gray-400 mt-1">🛠 Instagram Auto Login</p>
+        <button onclick="showModal(1)" class="mt-4 w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg">BELI</button>
+      </div>
+
+      <!-- Produk 3 -->
+      <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+        <img src="https://i.ibb.co/B2v2Kwrt/20250626-070523.jpg?text=All+Tools+Source" class="rounded-lg mb-3 w-full object-cover h-36" />
+        <h2 class="text-lg font-semibold">Harga 300K</h2>
+        <p class="text-gray-300">Permanent (Open Source)</p>
+        <p class="text-sm text-gray-400 mt-1">🧩 Semua Tools + Source</p>
+        <button onclick="showModal(2)" class="mt-4 w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg">BELI</button>
+      </div>
+    </div>
+    <p class="text-sm text-gray-500 mt-6">©sptzyy</p>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalOverlay" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-gray-900 rounded-xl max-w-md w-full p-6 text-left space-y-4 animate-fade-in">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xl font-bold">Detail Produk</h3>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-white text-xl">&times;</button>
+      </div>
+      <div id="modalContent" class="text-gray-300 space-y-2"></div>
+      <button onclick="goToPayment()" class="w-full bg-blue-600 hover:bg-blue-500 py-2 rounded-lg text-white">Lanjut Bayar</button>
+    </div>
+  </div>
+
+  <!-- Pembayaran -->
+  <div id="paymentPage" class="hidden w-full max-w-md mx-auto text-center space-y-6">
+    <h2 class="text-xl font-bold">PAYMENT</h2>
+    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+      <h3 class="text-lg font-semibold">DANA</h3>
+      <p class="text-gray-400">Nomor: <strong>08XX-XXXX-XXXX</strong></p>
+      <p class="text-gray-400">Nama: <strong>Sptzyy</strong></p>
+      <button onclick="mulaiProses()" class="mt-4 w-full bg-gray-700 hover:bg-gray-600 py-2 rounded-lg">Bayar Sekarang</button>
+    </div>
+    <p class="text-sm text-gray-500">©sptzyy</p>
+  </div>
+
+  <!-- Loading -->
+  <div id="loadingPage" class="hidden flex flex-col items-center space-y-4">
+    <div class="w-24 h-24 border-8 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
+    <p class="text-gray-300">Sedang memproses pembayaran...</p>
+  </div>
+
+  <!-- Notifikasi -->
+  <div id="notifPage" class="hidden flex flex-col items-center bg-gray-800 p-6 rounded-xl text-center space-y-4">
+    <p class="text-xl font-semibold">Lanjut proses konfirmasi oleh admin</p>
+    <a href="https://t.me/sptzyy" class="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-lg transition">chat admin</a>
+    <p class="text-sm text-gray-500">©sptzyy</p>
+  </div>
+
+  <!-- Script -->
+  <script>
+    const modalOverlay = document.getElementById("modalOverlay");
+    const modalContent = document.getElementById("modalContent");
+
+    const produkDetail = [
+      {
+        title: "Tools Facebook Auto Login (Encrypted)",
+        desc: [
+          "🔒 Status: Encrypted - tidak dapat dimodifikasi, bisa digunakan",
+          "📆 Masa berlaku: 1 Bulan",
+          "🛠 Fungsi: Melakukan login otomatis ke akun Facebook",
+        ]
+      },
+      {
+        title: "Tools Instagram Auto Login (Encrypted)",
+        desc: [
+          "🔒 Status: Encrypted - tidak dapat dimodifikasi, bisa digunakan",
+          "📆 Masa berlaku: 3 Bulan",
+          "🛠 Fungsi: Melakukan login otomatis ke akun Instagram",
+        ]
+      },
+      {
+        title: "Tools Open Source (Permanent)",
+        desc: [
+          "🧩 Status: Open Source - bisa dimodifikasi",
+          "♾️ Masa berlaku: Selamanya",
+          "📦 Termasuk semua tools dan fitur tambahan",
+        ]
+      }
+    ];
+
+    function showModal(index) {
+      const data = produkDetail[index];
+      modalContent.innerHTML = `<h4 class="text-lg font-semibold mb-2">${data.title}</h4>` +
+        data.desc.map(p => `<p class="text-sm">${p}</p>`).join("");
+      modalOverlay.classList.remove("hidden");
+    }
+
+    function closeModal() {
+      modalOverlay.classList.add("hidden");
+    }
+
+    function goToPayment() {
+      closeModal();
+      document.getElementById("produkPage").classList.add("hidden");
+      document.getElementById("paymentPage").classList.remove("hidden");
+    }
+
+    function mulaiProses() {
+      document.getElementById("paymentPage").classList.add("hidden");
+      document.getElementById("loadingPage").classList.remove("hidden");
+      setTimeout(() => {
+        document.getElementById("loadingPage").classList.add("hidden");
+        document.getElementById("notifPage").classList.remove("hidden");
+      }, 10000);
+    }
+
+    // Latar bintang
+    const canvas = document.getElementById("starfield");
+    const ctx = canvas.getContext("2d");
+    let stars = [];
+    const numStars = 120;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    for (let i = 0; i < numStars; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 1.5 + 0.5,
+        speed: Math.random() * 0.9 + 0.5
+      });
+    }
+
+    function animateStars() {
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      for (let star of stars) {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+        star.y += star.speed;
+        if (star.y > canvas.height) {
+          star.y = 0;
+          star.x = Math.random() * canvas.width;
+        }
+      }
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+  </script>
+
+</body>
+</html>
